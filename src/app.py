@@ -9,10 +9,9 @@ from sqlalchemy.engine import Connection
 import pandas as pd
 
 
-app = dash.Dash()
-server = app.server
+app = dash.Dash(__name__)
 
-load_dotenv(dotenv_path='.env')
+load_dotenv(dotenv_path='/home/nonso/Desktop/playground/plotlydash/src/.env')
 
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
@@ -21,7 +20,7 @@ DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
 
-
+print(f">>>>>>>>>>>>>>>>>>>>\n ALCHEMY STRING IS: {SQL_ALCHEMY_CONN_STRING}\n")
 def get_sql_alchemy_engine(conn_string) -> Connection:
     """Gets an SQL Alchemy engine connection object
 
@@ -107,4 +106,4 @@ app.layout = html.Div(children=[
 
 
 if __name__ == '__main__':
-    server.run()
+    app.run_server(port=5000)
