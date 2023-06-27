@@ -9,7 +9,7 @@ from sqlalchemy.engine import Connection
 import pandas as pd
 
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, url_base_pathname='/dashapp/')
 
 load_dotenv(dotenv_path='/home/nonso/Desktop/playground/plotlydash/src/.env')
 
