@@ -10,6 +10,7 @@ import pandas as pd
 
 
 app = dash.Dash(__name__, url_base_pathname='/dashapp/')
+server = app.server
 
 load_dotenv(dotenv_path='/home/nonso/Desktop/playground/plotlydash/src/.env')
 
@@ -106,4 +107,4 @@ app.layout = html.Div(children=[
 
 
 if __name__ == '__main__':
-    app.run_server(port=5000)
+    server.run(host='0.0.0.0', port='5000')
