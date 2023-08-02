@@ -10,7 +10,7 @@ import pandas as pd
 
 
 app = dash.Dash(__name__, url_base_pathname='/dashapp/')
-server = app.server
+# server = app.server
 
 load_dotenv(dotenv_path='/home/nonso/Desktop/playground/plotlydash/src/.env')
 
@@ -31,7 +31,7 @@ def get_sql_alchemy_engine(conn_string) -> Connection:
     Returns:
         Connection: A connection object using SqlAlchemy
     """
-    db = create_engine(conn_string)
+    db = create_engine(conn_string, pool_size=20, max_overflow=0)
     conn = db.connect()
     conn.autocommit = True
     
@@ -40,25 +40,25 @@ def get_sql_alchemy_engine(conn_string) -> Connection:
 
 conn = get_sql_alchemy_engine(SQL_ALCHEMY_CONN_STRING)
 df = pd.read_sql_query('SELECT * FROM listing', conn)
-list_of_provinces = df['province'].unique().tolist()
+list_of_cities = df['city'].unique().tolist()
 
 # print(data.head())
 def days_on_market():
-    rental_listing_by_province = df.groupby(['province'])['mls_num'].count().reset_index(name= 'num_of_listing')
+    rental_listing_by_cities = df.groupby(['city'])['mls_num'].count().reset_index(name= 'num_of_listing')
     # trace = [go.Bar(x=rental_listing_by_province['province'], y=rental_listing_by_province['num_of_listing'], marker={'color': rental_listing_by_province['num_of_listing']})]
     
-    trace = [go.Pie(labels=rental_listing_by_province['province'], values=rental_listing_by_province['num_of_listing'],
+    trace = [go.Pie(labels=rental_listing_by_cities['city'], values=rental_listing_by_cities['num_of_listing'],
                 textinfo='label+percent',
                 insidetextorientation='radial',
                 pull=[0, 0, 0, 0.3])]
-    return dict(data=trace, layout=go.Layout(title='Number of Rental Listings per Province'))
+    return dict(data=trace, layout=go.Layout(title='Percentage Inventory by City'))
 
 
 
 @app.callback(Output(component_id='table', component_property='data'),
                 [Input(component_id='dropdownio', component_property='value')])
-def get_table_data(province):
-    dff = df[df['province'] == province]
+def get_table_data(city):
+    dff = df[df['city'] == city]
     return dff.to_dict('records')
     
     
@@ -69,8 +69,8 @@ def get_table_data(province):
     [Input(component_id='dropdownio', component_property='value')])
 def update_output_div(input_value):
     
-    filtered_df_by_province = df[(df['province'] == input_value) & (df['property_type'] == 'Single Family')]
-    avg_price_by_city = filtered_df_by_province.groupby(['city'])['price'].mean().round(0).reset_index(name='average_price')
+    filtered_df_by_city= df[(df['city'] == input_value) & (df['property_type'] == 'Single Family')]
+    avg_price_by_city = filtered_df_by_city.groupby(['city'])['price'].mean().round(0).reset_index(name='average_price')
     # print(avg_price_by_city.head())
     trace = [go.Bar(x=avg_price_by_city['city'], y=avg_price_by_city['average_price'], name='Average price by city')]
     return dict(data=trace, layout=go.Layout(title='Average Price per City'))
@@ -82,8 +82,8 @@ app.layout = html.Div(children=[
         html.Div(id='sub-container',children=[
             dcc.Dropdown(id='dropdownio',
             options=[
-                {'label': province, 'value': province} for province in list_of_provinces
-            ], value='NL'),
+                {'label': city, 'value': city} for city in list_of_cities
+            ], value='St. John\'s'),
         
             dcc.Graph(id='my-div')]),
         
@@ -107,4 +107,4 @@ app.layout = html.Div(children=[
 
 
 if __name__ == '__main__':
-    server.run_server(port='5000')
+    app.run_server(port='5000')
