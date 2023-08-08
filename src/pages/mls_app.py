@@ -1,5 +1,5 @@
 import dash
-from dash import html, dcc, Input, Output, dash_table
+from dash import html, dcc, Input, Output, dash_table, callback
 import plotly.graph_objs as go
 import numpy as np
 import os
@@ -9,8 +9,10 @@ from sqlalchemy.engine import Connection
 import pandas as pd
 
 
-app = dash.Dash(__name__, url_base_pathname='/dashapp/')
-server = app.server
+# from server import app
+# app = dash.Dash(__name__, url_base_pathname='/dashapp/')
+dash.register_page(__name__, path='/mls')
+# server = app.server
 
 load_dotenv(dotenv_path='/home/nonso/Desktop/playground/plotlydash/src/.env')
 
@@ -55,7 +57,7 @@ def days_on_market():
 
 
 
-@app.callback(Output(component_id='table', component_property='data'),
+@callback(Output(component_id='table', component_property='data'),
                 [Input(component_id='dropdownio', component_property='value')])
 def get_table_data(city):
     dff = df[df['city'] == city]
@@ -64,7 +66,7 @@ def get_table_data(city):
     
     
 
-@app.callback(
+@callback(
     Output(component_id='my-div', component_property='figure'),
     [Input(component_id='dropdownio', component_property='value')])
 def update_output_div(input_value):
@@ -77,7 +79,8 @@ def update_output_div(input_value):
 
 
 
-app.layout = html.Div(children=[
+
+layout = html.Div(children=[
     html.Div(id='graphs-container',children=[
         html.Div(id='sub-container',children=[
             dcc.Dropdown(id='dropdownio',
@@ -106,5 +109,6 @@ app.layout = html.Div(children=[
 
 
 
-if __name__ == '__main__':
-    server.run(port='5000')
+
+# if __name__ == '__main__':
+#     server.run(port='5000')
