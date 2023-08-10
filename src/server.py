@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc
 import dash
 
-app = Dash(__name__, use_pages=True)
+app = Dash(__name__, use_pages=True, url_base_pathname='/dashapp/')
 server = app.server
 
 app.layout = html.Div([
